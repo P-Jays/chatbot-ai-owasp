@@ -50,13 +50,14 @@ Use make dev locally to spin up both apps. Use make test before pushing to verif
 ## 5. Backend Environment Variables
 
 The backend requires the following environment variables (set in Fly.io secrets or .env.local):
-
+```
 GEMINI_API_KEY – your Google Generative AI API key
 GEMINI_MODEL – e.g., gemini-1.5-flash
 ALLOWED_ORIGIN – URL of the frontend (http://localhost:3000
  or your Vercel URL)
 ENABLE_RAG – true/false to toggle OWASP context augmentation
 RAG_DEBUG – true/false to include debug info about retrieved OWASP entries
+```
 
 Example run locally with Docker:
 ```
