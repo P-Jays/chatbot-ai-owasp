@@ -13,7 +13,28 @@ export const app = express();
 
 app.use(pinoHttp({ logger }));
 app.use(helmet());
-app.use(cors({ origin: env.ALLOWED_ORIGIN || '*', credentials: true }));
+// app.use(cors({ origin: env.ALLOWED_ORIGIN || '*', credentials: true }));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+
+      // allowed origins list
+      const allowedOrigins = [
+        'http://localhost:3000',           // local dev
+        'https://chatbot-ai-owasp.vercel.app', // your Vercel frontend
+      ];
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS not allowed for origin: ${origin}`));
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(express.json({ limit: '1mb' }));
 
 
