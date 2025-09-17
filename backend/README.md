@@ -10,20 +10,20 @@ It integrates Google’s Gemini API (free tier) to generate responses and can au
 
 ## 2. Tech Stack
 
-• Node.js 20
-• Express
-• Zod for env validation
-• Helmet for secure headers
-• Express Rate Limit
-• Pino for logging
-• MiniSearch for OWASP dataset search
-• Docker + Fly.io deployment
+* Node.js 20
+* Express
+* Zod for env validation
+* Helmet for secure headers
+* Express Rate Limit
+* Pino for logging
+* MiniSearch for OWASP dataset search
+* Docker + Fly.io deployment
 
 ## 3. Directory Structure
 
-• src/ – application source code
-• data/ – OWASP Q&A CSV dataset
-• dist/ – compiled JavaScript output (after npm run build)
+* src/ – application source code
+* data/ – OWASP Q&A CSV dataset
+* dist/ – compiled JavaScript output (after npm run build)
 
 ## 4. Running Locally
 ```
@@ -63,15 +63,15 @@ flyctl logs -a your-app-name to monitor logs.
 ```
 7. API Endpoints
 
-• ```GET /health``` – health check
-• ```GET /version``` – returns name and env
-• ```POST /api/chat``` – main chatbot endpoint
-• ```GET /api/rag?q=… ```– OWASP debug search
+* ```GET /health``` – health check
+* ```GET /version``` – returns name and env
+* ```POST /api/chat``` – main chatbot endpoint
+* ```GET /api/rag?q=… ```– OWASP debug search
 
 8. Testing
 
-• ```npm test ```runs Vitest unit tests
-• Rate-limit and env validation tests included
-• E2E smoke test runs from root with Playwright
-• /api/chat route with RAG
-• session store
+* ```npm test ```runs Vitest unit tests
+* Rate-limit and env validation tests included
+* E2E smoke test runs from root with Playwright
+* /api/chat route with RAG
+* session store
