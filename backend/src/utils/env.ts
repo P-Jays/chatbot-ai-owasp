@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { z } from "zod";
 
 const EnvSchema = z.object({
@@ -13,7 +12,10 @@ const EnvSchema = z.object({
 });
 
 export type Env = z.infer<typeof EnvSchema>;
-export const env: Env = EnvSchema.parse(process.env);
+export function loadEnv(): Env {
+  return EnvSchema.parse(process.env);
+}
+export const env = loadEnv();
 
 export const isRagEnabled = () => env.ENABLE_RAG.toLowerCase() !== 'false';
 export const isRagDebug = () => env.RAG_DEBUG.toLowerCase() === 'true';
