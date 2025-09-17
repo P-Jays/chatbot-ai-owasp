@@ -1,0 +1,109 @@
+openapi: 3.0.3
+info:
+  title: Security Assistant Chat API
+  version: 1.0.0
+  description: >
+    Backend for the floating chatbot widget. Generates responses via Google Gemini
+    and optionally augments with OWASP CSV (RAG). Sessions are in-memory.
+
+servers:
+  - url: http://localhost:8080
+    description: Local dev
+  - url: https://YOUR-FLY-APP.fly.dev
+    description: Production
+
+paths:
+  /healthz:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+
+  /version:
+    get:
+      summary: Version info
+      responses:
+        '200':
+          description: App version
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version: { type: string }
+                  commit: { type: string, nullable: true }
+
+  /api/chat:
+    post:
+      summary: Send a message and receive model reply
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                sessionId:
+                  type: string
+                  description: Optional. If omitted, server will create one.
+                message:
+                  type: string
+                  minLength: 1
+      responses:
+        '200':
+          description: Chat reply
+          headers:
+            X-RateLimit-Limit:
+              schema: { type: string }
+            X-RateLimit-Remaining:
+              schema: { type: string }
+            X-RateLimit-Reset:
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [sessionId, reply]
+                properties:
+                  sessionId: { type: string }
+                  reply: { type: string }
+                  ragDebug:
+                    type: string
+                    description: Present only if RAG_DEBUG=true
+        '400':
+          description: Validation error
+        '401':
+          description: Missing/invalid API key (upstream)
+        '429':
+          description: Rate limited
+        '500':
+          description: Internal error
+
+  /api/rag/search:
+    get:
+      summary: Search OWASP CSV (bonus)
+      parameters:
+        - in: query
+          name: q
+          schema: { type: string }
+          required: true
+      responses:
+        '200':
+          description: Results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        question: { type: string }
+                        answer: { type: string }
+                        score: { type: number }
+        '400':
+          description: Missing q
