@@ -53,8 +53,7 @@ The backend requires the following environment variables (set in Fly.io secrets 
 ```
 GEMINI_API_KEY – your Google Generative AI API key
 GEMINI_MODEL – e.g., gemini-1.5-flash
-ALLOWED_ORIGIN – URL of the frontend (http://localhost:3000
- or your Vercel URL)
+ALLOWED_ORIGIN – URL of the frontend (http://localhost:3000 or your Vercel URL)
 ENABLE_RAG – true/false to toggle OWASP context augmentation
 RAG_DEBUG – true/false to include debug info about retrieved OWASP entries
 ```
