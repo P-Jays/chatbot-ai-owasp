@@ -7,7 +7,7 @@ import { logger } from "../utils/logger";
 
 type Row = { id: number; question: string; answer: string };
 
-const csvPath = path.resolve(process.cwd(), "src/data/owasp.csv");
+const csvPath = path.resolve(process.cwd(), "data/owasp.csv");
 let mini: MiniSearch<Row> | null = null;
 let rows: Row[] = [];
 
