@@ -41,3 +41,7 @@ Thumbs.db
 # Test artifacts
 *.snap
 .vscode/
+
+# Temporary zips
+frontend.zip
+backend.zip
