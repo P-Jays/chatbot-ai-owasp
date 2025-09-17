@@ -48,3 +48,10 @@ test-backend:
 build:
 	cd $(FRONTEND_DIR) && npm run build
 	cd $(BACKEND_DIR) && npm run build
+
+.PHONY: e2e
+e2e:
+	# install browsers if not already
+	npx playwright install
+	# run the e2e smoke test against your deployed backend (adjust BASE_URL if needed)
+	npx playwright test tests/e2e-smoke.spec.ts
