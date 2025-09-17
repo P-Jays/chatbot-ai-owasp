@@ -1,0 +1,102 @@
+=========================
+🚀 Security Assistant – Quick Run Guide
+=========================
+
+This is a full-stack chatbot built with:
+- Frontend: Next.js 15 + Tailwind + shadcn/ui
+- Backend: Node.js + Express + Google Gemini API + optional RAG
+- Deployed: Frontend on Vercel, Backend on Fly.io
+- Tests: Unit + Playwright E2E smoke test
+
+-------------------------------------------------
+1. Install Everything (from repo root)
+-------------------------------------------------
+make install
+
+-------------------------------------------------
+2. Run Both Services Locally
+-------------------------------------------------
+make dev    # runs backend on :8080 and frontend on :3000
+
+Open http://localhost:3000 and click the chat button.
+
+-------------------------------------------------
+3. Environment Variables
+-------------------------------------------------
+Frontend: NEXT_PUBLIC_API_URL=http://localhost:8080
+Backend:
+  GEMINI_API_KEY=your-google-api-key
+  GEMINI_MODEL=gemini-1.5-flash
+  ALLOWED_ORIGIN=http://localhost:3000
+  ENABLE_RAG=true
+  RAG_DEBUG=false
+
+-------------------------------------------------
+4. Run Tests
+-------------------------------------------------
+Unit tests:
+  make test-frontend
+  make test-backend
+
+End-to-end smoke test:
+  npx playwright install   # once
+  npx playwright test tests/e2e-smoke.spec.ts
+
+-------------------------------------------------
+5. Deploy
+-------------------------------------------------
+Frontend:
+  Push frontend folder to GitHub and connect to Vercel.
+
+Backend:
+  flyctl launch
+  flyctl secrets set GEMINI_API_KEY=xxx GEMINI_MODEL=gemini-1.5-flash ALLOWED_ORIGIN=https://your-vercel-url
+  flyctl deploy --remote-only
+
+Backend will be at: https://<your-app>.fly.dev
+
+-------------------------------------------------
+6. Playwright Smoke Test vs Production
+-------------------------------------------------
+Edit tests/e2e-smoke.spec.ts to use your deployed URLs and run:
+  npx playwright test tests/e2e-smoke.spec.ts
+
+You’ll see the widget open, send a message and get a real reply.
+
+=========================
+That’s it! Reviewers can follow these steps to run and verify everything.
+=========================
+
+
+                ┌─────────────────────────────────────────────────┐
+                │                 Frontend (Vercel)               │
+                │  Next.js 15 + Tailwind + shadcn/ui               │
+                │  Floating Chat Widget (open/close, bubbles)      │
+                └───────────────▲─────────────────────────────────┘
+                                │  HTTPS POST /api/chat
+                                │
+                ┌───────────────┴─────────────────────────────────┐
+                │              Backend (Fly.io)                   │
+                │  Node.js + Express + Pino + Helmet + CORS        │
+                │  Session store (in-memory)                      │
+                │  Rate limiting (express-rate-limit)             │
+                │                                                 │
+                │ Routes:                                         │
+                │   GET /health  – health check                   │
+                │   GET /version – version info                   │
+                │   POST /api/chat – Gemini + RAG reply           │
+                │   GET /api/rag/search – OWASP CSV search (bonus)│
+                └───────────────▲─────────────────────────────────┘
+                                │ calls Google API
+                                │
+                ┌───────────────┴─────────────────────────────────┐
+                │         Google Gemini API (free tier)            │
+                │  Generates main chatbot responses                │
+                └───────────────▲─────────────────────────────────┘
+                                │  augmented with context from
+                                │
+                ┌───────────────┴─────────────────────────────────┐
+                │    OWASP CSV / MiniSearch Index (in backend)     │
+                │  Query user’s message and provide relevant Q&A   │
+                │  RAG context injected into Gemini prompt         │
+                └──────────────────────────────────────────────────┘
