@@ -16,7 +16,19 @@ app.use(helmet());
 app.use(cors({ origin: env.ALLOWED_ORIGIN || '*', credentials: true }));
 app.use(express.json({ limit: '1mb' }));
 
-app.use(rateLimit({ windowMs: 60_000, max: 60 })); // 60 req/min/ip
+
+// Rate limit middleware (60 req / min by default)
+const maxReqs = env.NODE_ENV === 'test' ? 3 : 60;
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: maxReqs,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => {
+    res.status(429).json({ error: 'Too many requests, slow down.' });
+  },
+});
+app.use(limiter);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 app.get('/version', (_req, res) => res.json({
