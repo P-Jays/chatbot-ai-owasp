@@ -41,7 +41,7 @@ export default function ChatWidget() {
     } else if (!open) {
       requestAnimationFrame(() => triggerRef.current?.focus());
     }
-  }, [open]);
+  }, [open, msgs.length, addAssistantMessage]);
 
   async function doSend() {
     const message = input.trim();
