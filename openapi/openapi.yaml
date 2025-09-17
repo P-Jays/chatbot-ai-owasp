@@ -4,24 +4,42 @@ info:
   version: 1.0.0
   description: >
     Backend for the floating chatbot widget. Generates responses via Google Gemini
-    and optionally augments with OWASP CSV (RAG). Sessions are in-memory.
+    and optionally augments with OWASP CSV (RAG). Sessions are stored in-memory.
 
 servers:
   - url: http://localhost:8080
-    description: Local dev
-  - url: https://YOUR-FLY-APP.fly.dev
-    description: Production
+    description: Local development
+  - url: https://chatbot-backend-fragrant-dust-7209.fly.dev
+    description: Production on Fly.io
+
+tags:
+  - name: Health
+    description: Health & version endpoints
+  - name: Chat
+    description: Chatbot interaction endpoints
+  - name: OWASP RAG
+    description: Search OWASP CSV (bonus)
 
 paths:
-  /healthz:
+  /health:
     get:
+      tags: [Health]
       summary: Health check
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
 
   /version:
     get:
+      tags: [Health]
       summary: Version info
       responses:
         '200':
@@ -31,11 +49,16 @@ paths:
               schema:
                 type: object
                 properties:
-                  version: { type: string }
-                  commit: { type: string, nullable: true }
+                  name:
+                    type: string
+                    example: chatbot-backend
+                  env:
+                    type: string
+                    example: production
 
   /api/chat:
     post:
+      tags: [Chat]
       summary: Send a message and receive model reply
       requestBody:
         required: true
@@ -48,18 +71,23 @@ paths:
                 sessionId:
                   type: string
                   description: Optional. If omitted, server will create one.
+                  example: AaSGFsMsW5apAyFoawpFn
                 message:
                   type: string
                   minLength: 1
+                  example: Tell me about BOLA
       responses:
         '200':
           description: Chat reply
           headers:
-            X-RateLimit-Limit:
+            ratelimit-limit:
+              description: Requests allowed per window
               schema: { type: string }
-            X-RateLimit-Remaining:
+            ratelimit-remaining:
+              description: Remaining requests
               schema: { type: string }
-            X-RateLimit-Reset:
+            ratelimit-reset:
+              description: Reset time (seconds)
               schema: { type: string }
           content:
             application/json:
@@ -67,28 +95,40 @@ paths:
                 type: object
                 required: [sessionId, reply]
                 properties:
-                  sessionId: { type: string }
-                  reply: { type: string }
+                  sessionId:
+                    type: string
+                    example: AaSGFsMsW5apAyFoawpFn
+                  reply:
+                    type: string
+                    example: >
+                      Broken Object Level Authorization (BOLA). The server fails
+                      to properly verify client access rights...
                   ragDebug:
                     type: string
                     description: Present only if RAG_DEBUG=true
+                    example: |
+                      [OWASP Context]
+                      (1) Q: What is the security weakness associated with BOLA?
+                      ...
+                      [End Context]
         '400':
           description: Validation error
-        '401':
-          description: Missing/invalid API key (upstream)
         '429':
           description: Rate limited
         '500':
           description: Internal error
 
-  /api/rag/search:
+  /api/rag:
     get:
+      tags: [OWASP RAG]
       summary: Search OWASP CSV (bonus)
       parameters:
         - in: query
           name: q
           schema: { type: string }
           required: true
+          description: Query string to search OWASP CSV
+          example: xss
       responses:
         '200':
           description: Results
@@ -102,8 +142,14 @@ paths:
                     items:
                       type: object
                       properties:
-                        question: { type: string }
-                        answer: { type: string }
-                        score: { type: number }
+                        question:
+                          type: string
+                          example: What measures can be taken to prevent XSS?
+                        answer:
+                          type: string
+                          example: Validate input, encode output...
+                        score:
+                          type: number
+                          example: 223.04
         '400':
           description: Missing q
