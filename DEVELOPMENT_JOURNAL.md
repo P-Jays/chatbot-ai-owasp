@@ -159,18 +159,13 @@ It keeps prompt-building logic in one place, making it easy to tweak. Clipping h
 
 ---
 
-### 
-
-For production you’d move sessions and the OWASP index to a proper data store, add background re-indexing, cache Gemini calls, etc. But for an interview assignment this strikes a good balance between clarity and functionality.
-
-
-### 🔹 What the RAG Component Does
+### What the RAG Component Does
 
 This backend is a **small “retrieval-augmented generation” (RAG)** pipeline: before sending the user’s message to Gemini, it searches a local CSV of OWASP Q\&A, pulls the top hits, and injects them into the prompt. Gemini then sees both the question and the relevant OWASP context and can answer more accurately.
 
 ---
 
-### 🔹 How the Search Mechanism Works
+### How the Search Mechanism Works
 
 **`rag.service.ts`**
 
@@ -197,7 +192,7 @@ So the CSV is never queried on disk per request — it’s pre-indexed in memory
 
 ---
 
-### 🔹 How OWASP Data is Integrated into the Chatbot’s Responses
+### How OWASP Data is Integrated into the Chatbot’s Responses
 
 **`chat.controller.ts`**
 
@@ -228,7 +223,7 @@ so it can blend generative text with retrieved facts.
 
 ---
 
-### 🔹 Why This Solution Works Well for a Small Project
+### Why This Solution Works Well for a Small Project
 
 * **No external DB needed** – just a CSV and an in-memory index.
 * **Fast startup** – MiniSearch builds index once on boot.
@@ -248,7 +243,7 @@ so it can blend generative text with retrieved facts.
 
 ---
 
-### 🔹 Extra Best-Practice Choices in This Code
+### Extra Best-Practice Choices in This Code
 
 * **`zod` validation** protects against malformed requests.
 * **`sessionStore`** keeps chat context per session.
